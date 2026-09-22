@@ -46,5 +46,4 @@ Search in the sidebar covers all of it — try "instagram", "a4", "vinyl",
 
 Platform specs were checked against the platforms' own docs where they
 publish them (Apple, Spotify, SoundCloud, Bandcamp, YouTube) and current
-guides where they don't. They change — Instagram moved its grid to 3:4 in
-2025 — so re-check anything that looks off.
+guides where they don't. Things change. Lmk.
