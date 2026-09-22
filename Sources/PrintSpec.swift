@@ -116,11 +116,11 @@ struct PrintSpec {
         }
     }
 
-    private func length(_ inches: Double) -> String {
+    func length(_ inches: Double) -> String {
         metric ? "\(Calc.fmt(inches * 25.4, 1)) mm" : "\(Calc.fmt(inches, 3)) in"
     }
 
-    private func size(_ w: Double, _ h: Double) -> String {
+    func size(_ w: Double, _ h: Double) -> String {
         metric ? Calc.pair(w * 25.4, h * 25.4, "mm", places: 1) : Calc.pair(w, h, "in")
     }
 }

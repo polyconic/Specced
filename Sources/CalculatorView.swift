@@ -117,28 +117,24 @@ struct CalculatorView: View {
                     }
                 }
 
-                if model.unit != .px, let r = result {
-                    let match = PresetData.match(r.inches)
-                    let auto = match?.kind ?? PrintKind.guess(longSide: max(r.inches.w, r.inches.h))
-                    let spec = PrintSpec(kind: model.printKind ?? auto, width: r.inches.w, height: r.inches.h,
-                                         metric: model.unit != .inches)
+                if let c = model.calcPrint {
                     Card {
                         VStack(alignment: .leading, spacing: 12) {
                             HStack(alignment: .firstTextBaseline) {
                                 Text("Recommended").font(.headline)
-                                if let match {
+                                if let match = c.match {
                                     Text("· \(match.name ?? match.note ?? match.title)").foregroundStyle(.secondary)
                                 }
                                 Spacer()
                                 Picker("Print as", selection: $model.printKind) {
-                                    Text("Auto (\(auto.rawValue))").tag(PrintKind?.none)
+                                    Text("Auto (\(c.auto.rawValue))").tag(PrintKind?.none)
                                     ForEach(PrintKind.allCases) { Text($0.rawValue).tag(Optional($0)) }
                                 }
                                 .pickerStyle(.menu)
                                 .fixedSize()
                             }
-                            PrintSpecView(spec: spec)
-                            Button("Use this bleed and DPI") { model.apply(spec) }
+                            PrintSpecView(spec: c.spec)
+                            Button("Use this bleed and DPI") { model.apply(c.spec) }
                                 .buttonStyle(.bordered)
                                 .controlSize(.small)
                         }

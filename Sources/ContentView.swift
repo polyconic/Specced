@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var model: SpecModel
+    @EnvironmentObject var checker: Checker
 
     var body: some View {
         NavigationSplitView {
@@ -38,6 +39,23 @@ struct ContentView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        checker.showing = true
+                    } label: {
+                        Label("Check a File", systemImage: "checkmark.seal")
+                    }
+                    .labelStyle(.titleAndIcon)
+                    .help("Check an image against a size before you send it (⌘O)")
+                }
+            }
+        }
+        .onDrop(of: [.fileURL, .image], isTargeted: nil) { checker.handle($0) }
+        .sheet(isPresented: $checker.showing) {
+            CheckView()
+                .environmentObject(model)
+                .environmentObject(checker)
         }
     }
 }

@@ -27,6 +27,13 @@ enum Pane: String, CaseIterable, Identifiable {
     }
 }
 
+struct CalcPrint {
+    let title: String
+    let match: PrintSize?
+    let auto: PrintKind
+    let spec: PrintSpec
+}
+
 // No @State anywhere: this CLT SwiftUI SDK has no SwiftUIMacros plugin, so it won't compile. UI state lives here.
 @MainActor
 final class SpecModel: ObservableObject {
@@ -62,6 +69,18 @@ final class SpecModel: ObservableObject {
 
     private static func standardBleed(_ unit: LengthUnit) -> String {
         unit == .mm ? "3" : "0.125"
+    }
+
+    var calcPrint: CalcPrint? {
+        guard unit != .px,
+              let w = Calc.number(widthValue), let h = Calc.number(heightValue),
+              let r = Calc.run(width: widthValue, height: heightValue, unit: unit, dpi: dpi,
+                               bleed: nil, bleedUnit: bleedUnit) else { return nil }
+        let match = PresetData.match(r.inches)
+        let auto = match?.kind ?? PrintKind.guess(longSide: max(r.inches.w, r.inches.h))
+        return CalcPrint(title: Calc.pair(w, h, unit.rawValue), match: match, auto: auto,
+                         spec: PrintSpec(kind: printKind ?? auto, width: r.inches.w, height: r.inches.h,
+                                         metric: unit != .inches))
     }
 
     func load(_ size: PrintSize) {

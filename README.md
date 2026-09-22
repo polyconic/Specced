@@ -35,6 +35,17 @@ whatever size you type and recognizes known ones (11 × 17 comes up as a
 Tabloid poster: 0.125 in bleed → 11.25 × 17.25 in → 3375 × 5175 px).
 "Print as" overrides the guess; "Use this bleed and DPI" applies it.
 
+**Check a File** (toolbar, ⌘O, or drop an image on the window or Dock icon)
+— pick what it's for and Specced checks the actual file: resolution at
+that size, shape and crop, bleed, color profile, format, platform file-size
+caps, and text sitting where the Instagram UI, a profile-grid crop or a
+trim cut would hide it (found with macOS's on-device text recognition —
+nothing is uploaded). Stores' no-URL rule and Spotify's no-text rule are
+checked too. **Export Fixed Copy** does what can honestly be fixed:
+crops, downsizes and converts screen images to sRGB under any size cap,
+and retags print files with their real DPI as lossless TIFF. It never
+upscales, and it won't pretend to fix a low-res file or missing bleed.
+
 **File Formats** — images, video, and color (RGB vs CMYK, rich black).
 **Sending Out** — checklists for print shops, social, distributors, and
 clients. **DPI vs PPI** — the stuff that's easy to get backwards.

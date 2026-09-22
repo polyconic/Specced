@@ -18,7 +18,8 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 echo "==> Compiling (arm64, macOS $MIN_MACOS+)"
 swiftc -O -whole-module-optimization -parse-as-library -swift-version 5 \
     -target "arm64-apple-macosx$MIN_MACOS" \
-    -framework AppKit -framework SwiftUI \
+    -framework AppKit -framework SwiftUI -framework CoreGraphics -framework ImageIO \
+    -framework UniformTypeIdentifiers -framework Vision \
     "$ROOT"/Sources/*.swift \
     -o "$APP/Contents/MacOS/$APP_NAME"
 
@@ -57,6 +58,16 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>NSHighResolutionCapable</key><true/>
     <key>NSPrincipalClass</key><string>NSApplication</string>
     <key>NSHumanReadableCopyright</key><string>Gregor Egan</string>
+    <key>CFBundleDocumentTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeName</key><string>Image</string>
+            <key>CFBundleTypeRole</key><string>Viewer</string>
+            <key>LSHandlerRank</key><string>None</string>
+            <key>LSItemContentTypes</key>
+            <array><string>public.image</string></array>
+        </dict>
+    </array>
 </dict>
 </plist>
 PLIST

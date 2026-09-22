@@ -16,11 +16,23 @@ struct SizePreset: Identifiable {
     let ratio: String
     var note: String?
     var source: PrintSize?
+    var width: Double = 0
+    var height: Double = 0
+    var minimum = false
+    var floor: Double?
+    var maxBytes: Int?
+    var safe: SafeArea?
+    var noText = false
+    var noURLs = false
 
     var id: String { name }
 
-    static func px(_ name: String, _ w: Double, _ h: Double, _ note: String? = nil) -> SizePreset {
-        SizePreset(name: name, pixels: Calc.pxPair(w, h), ratio: Calc.ratio(w, h), note: note)
+    static func px(_ name: String, _ w: Double, _ h: Double, _ note: String? = nil,
+                   minimum: Bool = false, floor: Double? = nil, maxBytes: Int? = nil,
+                   safe: SafeArea? = nil, noText: Bool = false, noURLs: Bool = false) -> SizePreset {
+        SizePreset(name: name, pixels: Calc.pxPair(w, h), ratio: Calc.ratio(w, h), note: note,
+                   width: w, height: h, minimum: minimum, floor: floor, maxBytes: maxBytes,
+                   safe: safe, noText: noText, noURLs: noURLs)
     }
 
     func matches(_ q: String) -> Bool {
@@ -66,7 +78,8 @@ struct PrintSize {
                           pixels: Calc.pxPair(inches.w * dpi, inches.h * dpi),
                           ratio: Calc.ratio(width, height),
                           note: [size, note].compactMap { $0 }.joined(separator: " — "),
-                          source: self)
+                          source: self,
+                          width: inches.w * dpi, height: inches.h * dpi)
     }
 }
 
@@ -106,42 +119,50 @@ enum PresetData {
 
     static let music: [SizePreset] = [
         .px("Cover art (Spotify, Apple Music, stores)", 3000, 3000,
-            "Apple's minimum is 1400×1400, but send 3000. JPEG or PNG at max quality. No URLs, logos, dates or ads. YouTube Music builds its art tracks from this same file."),
+            "Apple's minimum is 1400×1400, but send 3000. JPEG or PNG at max quality. No URLs, logos, dates or ads. YouTube Music builds its art tracks from this same file.",
+            minimum: true, floor: 1400, noURLs: true),
         .px("Bandcamp cover art", 3000, 3000,
-            "Minimum 1400×1400. Bandcamp says bigger is better, so reuse the store cover."),
+            "Minimum 1400×1400. Bandcamp says bigger is better, so reuse the store cover.",
+            minimum: true, floor: 1400),
         .px("SoundCloud track artwork", 800, 800,
-            "Minimum. The file must be under 2 MB (JPG or PNG), so compress a larger square to fit. SoundCloud's own distribution wants 3000×3000."),
+            "Minimum. The file must be under 2 MB (JPG or PNG), so compress a larger square to fit. SoundCloud's own distribution wants 3000×3000.",
+            minimum: true, maxBytes: 2_000_000),
         .px("SoundCloud profile header", 2480, 520),
         .px("Spotify Canvas", 1080, 1920,
             "3–8 second loop, MP4 (or a still JPG), at least 720 px tall."),
         .px("Spotify artist header", 2660, 1140,
-            "Minimum. Spotify's rules: no text, ads, busy backgrounds or tour/release promos."),
-        .px("Spotify artist image", 750, 750, "Minimum."),
+            "Minimum. Spotify's rules: no text, ads, busy backgrounds or tour/release promos.",
+            minimum: true, maxBytes: 20_000_000, noText: true),
+        .px("Spotify artist image", 750, 750, "Minimum.",
+            minimum: true, maxBytes: 20_000_000, noText: true),
     ]
 
     static let social: [SizePreset] = [
         .px("Instagram post, grid-native", 1080, 1440,
             "Shows uncropped in the feed and on the profile grid — the best default since the 2025 grid change."),
         .px("Instagram post, portrait", 1080, 1350,
-            "The profile grid crops it to the center 1012×1350, so keep text centered."),
+            "The profile grid crops it to the center 1012×1350, so keep text centered.",
+            safe: .instagramGrid),
         .px("Instagram square", 1080, 1080),
         .px("Instagram landscape", 1080, 566),
         .px("Instagram carousel", 1080, 1440,
             "Any feed ratio works, but every slide takes the first slide's ratio."),
         .px("Instagram story / reel", 1080, 1920,
-            "Keep text and logos out of the top ~270 px, bottom ~670 px and ~65 px each side (Meta's 14% / 35% / 6%)."),
+            "Keep text and logos out of the top ~270 px, bottom ~670 px and ~65 px each side (Meta's 14% / 35% / 6%).",
+            safe: .metaVertical),
         .px("Instagram profile photo", 320, 320, "Shown at about 110×110."),
         .px("Facebook feed post", 1080, 1350,
             "Square 1080×1080 and landscape 1080×566 work too; portrait takes the most room on phones."),
         .px("Facebook cover photo", 851, 315,
             "Shows at 820×312 on desktop and 640×360 on phones — keep text centered."),
-        .px("Facebook story", 1080, 1920, "Same safe zone as Instagram stories."),
+        .px("Facebook story", 1080, 1920, "Same safe zone as Instagram stories.", safe: .metaVertical),
         .px("X post image", 1600, 900),
         .px("X header", 1500, 500),
         .px("X profile photo", 400, 400),
-        .px("YouTube thumbnail", 1280, 720, "At least 640 px wide, under 2 MB."),
+        .px("YouTube thumbnail", 1280, 720, "At least 640 px wide, under 2 MB.", maxBytes: 2_000_000),
         .px("YouTube channel banner", 2560, 1440,
-            "Keep text and logos in the center 1546×423 — the only part every device shows."),
+            "Keep text and logos in the center 1546×423 — the only part every device shows.",
+            safe: .youtubeBanner),
         .px("TikTok video", 1080, 1920),
         .px("LinkedIn post", 1200, 627),
         .px("LinkedIn profile banner", 1584, 396),
