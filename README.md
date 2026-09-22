@@ -47,3 +47,5 @@ Search in the sidebar covers all of it — try "instagram", "a4", "vinyl",
 Platform specs were checked against the platforms' own docs where they
 publish them (Apple, Spotify, SoundCloud, Bandcamp, YouTube) and current
 guides where they don't. Things change. Lmk.
+
+[gregor.art@pm.me](mailto:gregor.art@pm.me)
